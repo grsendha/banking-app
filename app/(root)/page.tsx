@@ -1,14 +1,27 @@
 import HeaderBox from '@/components/HeaderBox';
+import RecentTransactions from '@/components/RecentTransactions';
 import RightSidebar from '@/components/RightSidebar';
 import TotalBalanceBox from '@/components/TotalBalanceBox';
+import { getAccount, getAccounts } from '@/lib/actions/bank.actions';
 import { getLoggedInUser } from '@/lib/actions/user.actions';
 import { redirect } from 'next/navigation';
 import { useRouter } from 'next/router';
 import React from 'react'
 
-const Home = async () => {
-
+const Home = async ({ searchParams: { id, page } }: SearchParamProps) => {
+  const currentPage = Number(page as string) || 1;
   const loggedIn = await getLoggedInUser();
+  console.log({ id, page });
+  const accounts = await getAccounts({ userId: loggedIn?.$id })
+  if (!accounts) return;
+  const accountData = accounts?.data
+  const appwriteItemId = (id as string) || accountData[0]?.appwriteItemId;
+
+  const account = await getAccount({ appwriteItemId });
+  console.log({
+    accountData, account
+  });
+
 
   if (!loggedIn) {
     redirect('/sign-in');
@@ -20,20 +33,24 @@ const Home = async () => {
           <HeaderBox
             type="greeting"
             title="welcome"
-            user={loggedIn?.name || "guest"}
+            user={loggedIn?.firstName || "guest"}
             subtext="Access the account" />
           <TotalBalanceBox
-            accounts={[]}
-            totalBanks={1}
-            totalCurrentBalance={1010} />
+            accounts={accountData}
+            totalBanks={accounts?.totalBanks}
+            totalCurrentBalance={accounts?.totalCurrentBalance} />
 
         </header>
-
+        <RecentTransactions
+          accounts={accountData}
+          transactions={account?.transactions}
+          appwriteItemId={appwriteItemId}
+          page={currentPage} />
       </div>
       <RightSidebar
         user={loggedIn}
-        banks={[{ currentBalance: 272 }, { currentBalance: 22 }]}
-        transactions={[]} />
+        banks={accountData?.slice(0, 2) || []}
+        transactions={accountData?.transactions} />
     </section>
   )
 }

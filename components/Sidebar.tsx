@@ -12,15 +12,15 @@ const Sidebar = ({ user }: SiderbarProps) => {
   const pathname = usePathname();
 
   return (
-    <section className="sidebar">
+    <section className=" sidebar">
       <nav className="flex flex-col gap-4">
         <Link href="/" className="mb-12 cursor-pointer flex items-center gap-2">
           <Image
             src="/icons/logo.svg"
-            width={34}
-            height={34}
+            width={50}
+            height={50}
             alt="Horizon logo"
-            className="size-[24px] max-xl:size-14"
+          // className="size-[24px] max-xl:size-14"
           />
           <h1 className="sidebar-logo">Horizon</h1>
         </Link>
@@ -30,7 +30,7 @@ const Sidebar = ({ user }: SiderbarProps) => {
 
           return (
             <Link href={item.route} key={item.label}
-              className={cn('sidebar-link', { 'bg-bank-gradient': isActive })}
+              className={cn('sidebar-link', { 'bg-blue-500': isActive })}
             >
               <div className="relative size-6">
                 <Image

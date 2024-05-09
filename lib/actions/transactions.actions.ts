@@ -28,7 +28,7 @@ export const createTransaction = async (
     );
     return parseStringify(newTransaction);
   } catch (error) {
-    console.log("Error in create Transaction");
+    console.log(error);
   }
 };
 
@@ -46,7 +46,7 @@ export const getTransactionsByBankId = async ({
     const recieverTransactions = await database.listDocuments(
       DATABASE_ID!,
       TRANSACTION_COLLECTION_ID!,
-      [Query.equal("recieverBankId", bankId)]
+      [Query.equal("receiverBankId", bankId)]
     );
 
     const transactions = {
@@ -59,6 +59,6 @@ export const getTransactionsByBankId = async ({
 
     return parseStringify(transactions);
   } catch (error) {
-    console.log("Error in getTransactionsByBankId");
+    console.log(error);
   }
 };

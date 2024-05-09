@@ -11,20 +11,20 @@ import React from 'react'
 const Home = async ({ searchParams: { id, page } }: SearchParamProps) => {
   const currentPage = Number(page as string) || 1;
   const loggedIn = await getLoggedInUser();
+  if (loggedIn == null) {
+    redirect('/sign-in');
+  }
+  // console.log("Logged In", loggedIn);
   const accounts = await getAccounts({ userId: loggedIn?.$id })
   if (!accounts) return;
   const accountData = accounts?.data
   const appwriteItemId = (id as string) || accountData[0]?.appwriteItemId;
 
   const account = await getAccount({ appwriteItemId });
-  console.log({
-    accountData, account
-  });
+  // console.log("Account", account);
 
 
-  if (!loggedIn) {
-    redirect('/sign-in');
-  }
+
   return (
     <section className='home'>
       <div className='home-content'>

@@ -13,6 +13,7 @@ import {
 import { plaidClient } from "../plaid";
 import { addFundingSource, createDwollaCustomer } from "./dwolla.actions";
 import { revalidatePath } from "next/cache";
+import { useRouter } from "next/navigation";
 
 const {
   APPWRITE_DATABASE_ID: DATABASE_ID,
@@ -28,8 +29,6 @@ export const getUserInfo = async ({ userId }: getUserInfoProps) => {
       USER_COLLECTION_ID!,
       [Query.equal("userId", [userId])]
     );
-
-    console.log("USER INFO", user);
 
     return parseStringify(user.documents[0]);
   } catch (error) {
@@ -55,7 +54,6 @@ export const signIn = async ({ email, password }: signInProps) => {
 };
 
 export const signUp = async ({ password, ...userData }: SignUpParams) => {
-  console.log("Inside signUp", userData);
   let newUserAccount;
 
   const { email, firstName, lastName } = userData;
@@ -66,7 +64,7 @@ export const signUp = async ({ password, ...userData }: SignUpParams) => {
     newUserAccount = await account.create(ID.unique(), email, password, name);
 
     if (!newUserAccount) throw new Error("Error creating user account");
-    console.log("NEW USER ACCOUNT", newUserAccount);
+
     const dwollaCustomerUrl = await createDwollaCustomer({
       ...userData,
       type: "personal",
@@ -102,12 +100,15 @@ export const signUp = async ({ password, ...userData }: SignUpParams) => {
 };
 
 export const logoutAccount = async () => {
+  // const router = useRouter();
   try {
     const { account } = await createSessionClient();
 
     cookies().delete("appwrite-session");
 
     await account.deleteSession("current");
+    return true;
+    // router.replace("/sign-in");
   } catch (error) {
     return null;
   }
@@ -117,7 +118,6 @@ export async function getLoggedInUser() {
   try {
     const { account } = await createSessionClient();
     const result = await account.get();
-    console.log("USER IN ACTIONS", result);
 
     const user = await getUserInfo({ userId: result.$id });
 

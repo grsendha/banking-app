@@ -6,7 +6,8 @@ import { getAccount, getAccounts } from '@/lib/actions/bank.actions';
 import { getLoggedInUser } from '@/lib/actions/user.actions';
 import { redirect } from 'next/navigation';
 import { useRouter } from 'next/router';
-import React from 'react'
+import React, { Suspense } from 'react'
+import Loading from './loading';
 
 const Home = async ({ searchParams: { id, page } }: SearchParamProps) => {
   const currentPage = Number(page as string) || 1;
@@ -26,31 +27,33 @@ const Home = async ({ searchParams: { id, page } }: SearchParamProps) => {
 
 
   return (
-    <section className='home'>
-      <div className='home-content'>
-        <header className='home-header'>
-          <HeaderBox
-            type="greeting"
-            title="welcome"
-            user={loggedIn?.firstName || "guest"}
-            subtext="Access the account" />
-          <TotalBalanceBox
-            accounts={accountData}
-            totalBanks={accounts?.totalBanks}
-            totalCurrentBalance={accounts?.totalCurrentBalance} />
+    <Suspense fallback={<Loading />}>
+      <section className='home'>
+        <div className='home-content'>
+          <header className='home-header'>
+            <HeaderBox
+              type="greeting"
+              title="welcome"
+              user={loggedIn?.firstName || "guest"}
+              subtext="Access the account" />
+            <TotalBalanceBox
+              accounts={accountData}
+              totalBanks={accounts?.totalBanks}
+              totalCurrentBalance={accounts?.totalCurrentBalance} />
 
-        </header>
-        <RecentTransactions
-          accounts={accountData}
-          transactions={account?.transactions}
-          appwriteItemId={appwriteItemId}
-          page={currentPage} />
-      </div>
-      <RightSidebar
-        user={loggedIn}
-        banks={accountData?.slice(0, 2) || []}
-        transactions={account?.transactions} />
-    </section>
+          </header>
+          <RecentTransactions
+            accounts={accountData}
+            transactions={account?.transactions}
+            appwriteItemId={appwriteItemId}
+            page={currentPage} />
+        </div>
+        <RightSidebar
+          user={loggedIn}
+          banks={accountData?.slice(0, 2) || []}
+          transactions={account?.transactions} />
+      </section>
+    </Suspense>
   )
 }
 
